@@ -1,35 +1,31 @@
-package com.haulmont.testtask.model;
+package com.haulmont.testtask.model.entity;
 
 import javax.persistence.*;
+import java.util.Collection;
 
 @Entity
-@Table(name = "doctor")
-public class Doctor {
+@Table(name = "DOCTOR", schema = "PUBLIC", catalog = "PUBLIC")
+@NamedQueries({@NamedQuery(name = "Doctor.getAll", query = "FROM DoctorEntity")})
+public class DoctorEntity {
+    private long id;
+    private String firstName;
+    private String lastName;
+    private String middleName;
+    private String specialization;
+    private Collection<PrescriptionEntity> prescriptions;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private String firstName;
-
-    @Column(nullable = false)
-    private String lastName;
-
-    @Column
-    private String middleName;
-
-    @Column
-    private String specialization;
-
-    public Long getId() {
+    @Column(name = "ID")
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
+    @Basic
+    @Column(name = "FIRST_NAME")
     public String getFirstName() {
         return firstName;
     }
@@ -38,6 +34,8 @@ public class Doctor {
         this.firstName = firstName;
     }
 
+    @Basic
+    @Column(name = "LAST_NAME")
     public String getLastName() {
         return lastName;
     }
@@ -46,6 +44,8 @@ public class Doctor {
         this.lastName = lastName;
     }
 
+    @Basic
+    @Column(name = "MIDDLE_NAME")
     public String getMiddleName() {
         return middleName;
     }
@@ -54,11 +54,22 @@ public class Doctor {
         this.middleName = middleName;
     }
 
+    @Basic
+    @Column(name = "SPECIALIZATION")
     public String getSpecialization() {
         return specialization;
     }
 
     public void setSpecialization(String specialization) {
         this.specialization = specialization;
+    }
+
+    @OneToMany(mappedBy = "doctor")
+    public Collection<PrescriptionEntity> getPrescriptions() {
+        return prescriptions;
+    }
+
+    public void setPrescriptions(Collection<PrescriptionEntity> prescriptionsById) {
+        this.prescriptions = prescriptionsById;
     }
 }
