@@ -2,12 +2,13 @@ package com.haulmont.testtask.model.repository;
 
 import com.google.inject.Inject;
 import com.haulmont.testtask.model.dao.Dao;
+import com.haulmont.testtask.model.entity.Dto;
 import org.hibernate.exception.ConstraintViolationException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RepositoryImpl<T> implements Repository<T> {
+public class RepositoryImpl<T extends Dto> implements Repository<T> {
 
     private Dao<T> dao;
     private List<UpdateEntityListener> listeners;
@@ -34,10 +35,9 @@ public class RepositoryImpl<T> implements Repository<T> {
     }
 
     @Override
-    public T add(T entity) {
-        T dbEntity = dao.add(entity);
+    public void add(T entity) {
+        dao.add(entity);
         listeners.forEach(UpdateEntityListener::onUpdated);
-        return dbEntity;
     }
 
     @Override

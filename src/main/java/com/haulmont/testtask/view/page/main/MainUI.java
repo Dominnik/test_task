@@ -1,5 +1,9 @@
-package com.haulmont.testtask.view.main;
+package com.haulmont.testtask.view.page.main;
 
+import com.haulmont.testtask.view.core.Page;
+import com.haulmont.testtask.view.page.doctor.DoctorView;
+import com.haulmont.testtask.view.page.patient.PatientView;
+import com.haulmont.testtask.view.page.prescription.PrescriptionView;
 import com.vaadin.annotations.Theme;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
@@ -16,25 +20,9 @@ public class MainUI extends UI {
         getPage().setTitle(TITLE);
 
         Navigator navigator = new Navigator(this, this);
-        /*navigator.addView(Page.DOCTORS.getUrl(), new DoctorView());
+        navigator.addView(Page.DOCTORS.getUrl(), new DoctorView());
         navigator.addView(Page.PATIENTS.getUrl(), new PatientView());
-        navigator.addView(Page.PRESCRIPTIONS.getUrl(), new PrescriptionView());*/
+        navigator.addView(Page.PRESCRIPTIONS.getUrl(), new PrescriptionView());
         navigator.navigateTo(Page.DOCTORS.getUrl());
-    }
-
-    public enum Page {
-        DOCTORS("doctors"),
-        PATIENTS("patients"),
-        PRESCRIPTIONS("prescriptions");
-
-        private String url;
-
-        Page(String url) {
-            this.url = url;
-        }
-
-        public String getUrl() {
-            return url;
-        }
     }
 }

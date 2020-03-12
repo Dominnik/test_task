@@ -1,58 +1,80 @@
 package com.haulmont.testtask.model.dao;
 
-import org.hibernate.exception.ConstraintViolationException;
+import com.haulmont.testtask.model.entity.Dto;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
-import javax.persistence.EntityManager;
-import javax.persistence.RollbackException;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
-public abstract class AbstractDao<T> implements Dao<T> {
+public abstract class AbstractDao<T extends Dto> implements Dao<T> {
 
     protected Class<T> genericClass;
-    protected EntityManager manager;
+    protected SessionFactory factory;
 
-    public AbstractDao(Class<T> genericClass, EntityManager manager) {
+    public AbstractDao(Class<T> genericClass, SessionFactory factory) {
         this.genericClass = genericClass;
-        this.manager = manager;
+        this.factory = factory;
     }
 
     @Override
-    public T add(T entity) {
-        manager.getTransaction().begin();
-        T dbEntity = manager.merge(entity);
-        manager.getTransaction().commit();
-        manager.close();
-        return dbEntity;
+    public void add(T entity) {
+        inSession(session -> {
+            session.getTransaction().begin();
+            try {
+                session.save(entity);
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                session.getTransaction().rollback();
+            }
+        });
     }
 
     @Override
-    public void delete(long id) throws ConstraintViolationException {
-        manager.getTransaction().begin();
-        try {
-            T dbEntity = manager.find(genericClass, id);
+    public void delete(long id) {
+        inSession(session -> {
+            T dbEntity = get(id);
             if (dbEntity == null) return;
-            manager.remove(dbEntity);
-            manager.getTransaction().commit();
-        } catch (RollbackException e) {
-            if (manager.getTransaction().isActive()) {
-                manager.getTransaction().rollback();
-            } else throw e;
-        } finally {
-            manager.close();
-        }
+            session.getTransaction().begin();
+            try {
+                session.delete(dbEntity);
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                session.getTransaction().rollback();
+            }
+        });
     }
 
     @Override
     public void update(T entity) {
-        manager.getTransaction().begin();
-        manager.merge(entity);
-        manager.getTransaction().commit();
-        manager.close();
+        inSession(session -> {
+            session.getTransaction().begin();
+            try {
+                session.merge(entity);
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                session.getTransaction().rollback();
+            }
+        });
     }
 
     @Override
     public T get(long id) {
-        T result = manager.find(genericClass, id);
-        manager.close();
+        return inSession(session -> {
+            return session.find(genericClass, id);
+        });
+    }
+
+    protected void inSession(Consumer<Session> consumer) {
+        Session session = factory.openSession();
+        consumer.accept(session);
+        session.close();
+    }
+
+    protected <R> R inSession(Function<Session, R> consumer) {
+        Session session = factory.openSession();
+        R result = consumer.apply(session);
+        session.close();
         return result;
     }
 }

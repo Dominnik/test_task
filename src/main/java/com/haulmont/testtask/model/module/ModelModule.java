@@ -13,9 +13,8 @@ import com.haulmont.testtask.model.entity.PatientEntity;
 import com.haulmont.testtask.model.entity.PrescriptionEntity;
 import com.haulmont.testtask.model.repository.Repository;
 import com.haulmont.testtask.model.repository.RepositoryImpl;
-
-import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
 public class ModelModule extends AbstractModule {
 
@@ -31,8 +30,8 @@ public class ModelModule extends AbstractModule {
 
     @Provides
     @Singleton
-    EntityManager provideEntityManager() {
-        return Persistence.createEntityManagerFactory("PU").createEntityManager();
+    public SessionFactory provideSessionFactory() {
+        return new Configuration().configure().buildSessionFactory();
     }
 
 }

@@ -1,10 +1,11 @@
 package com.haulmont.testtask.controller;
 
 import com.google.inject.Inject;
+import com.haulmont.testtask.model.entity.Dto;
 import com.haulmont.testtask.model.repository.Repository;
 import org.hibernate.exception.ConstraintViolationException;
 
-public class ControllerImpl<T> implements Controller<T> {
+public class ControllerImpl<T extends Dto> implements Controller<T> {
 
     private Repository<T> repository;
 
@@ -14,8 +15,8 @@ public class ControllerImpl<T> implements Controller<T> {
     }
 
     @Override
-    public T add(T entity) {
-        return repository.add(entity);
+    public void add(T entity) {
+        repository.add(entity);
     }
 
     @Override
